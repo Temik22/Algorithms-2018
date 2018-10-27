@@ -117,7 +117,35 @@ abstract class AbstractTaskTests : AbstractFileTests() {
     }
 
     protected fun sortSequence(sortSequence: (String, String) -> Unit) {
-        // TODO: large test
+        try {
+            sortSequence("input/seq_myIn.txt", "temp.txt")
+            assertFileContent("temp.txt",
+                    """
+                        1
+                        5
+                        4
+                        5
+                        2
+                        5
+                        4
+                        2
+                        1
+                        2
+                        1
+                        2
+                        4
+                        5
+                        5
+                        4
+                        3
+                        3
+                        3
+                        3
+                        3
+                    """.trimIndent())
+        } finally {
+            File("temp.txt").delete()
+        }
         try {
             sortSequence("input/seq_in1.txt", "temp.txt")
             assertFileContent("temp.txt",

@@ -2,6 +2,10 @@
 
 package lesson1
 
+import java.io.File
+import java.lang.IllegalArgumentException
+import java.util.*
+
 /**
  * Сортировка времён
  *
@@ -31,8 +35,29 @@ package lesson1
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortTimes(inputName: String, outputName: String) {
-    TODO()
+    val list = File(inputName).readLines().map { it -> it.split(':') }.map { it ->
+        it.reversed().foldIndexed(0)
+        { index, prev, elem -> Math.pow(60.0, index.toDouble()).toInt() * elem.toInt() + prev }
+    }.toIntArray()
+    insertionSort(list)
+    val outputFile = File(outputName).bufferedWriter()
+    for (i in 0..list.lastIndex) {
+        outputFile.write("${toTwoDigit(list[i] / 3600)}:" + "${toTwoDigit((list[i] / 60) % 60)}:"
+                + toTwoDigit(list[i] % 60))
+        outputFile.newLine()
+    }
+    outputFile.close()
 }
+
+/**
+ * Additional function
+ */
+
+fun toTwoDigit(x: Int): String {
+    if (x in 0..9) return "0$x"
+    return "$x"
+}
+
 
 /**
  * Сортировка адресов
@@ -95,7 +120,36 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    val input = File(inputName).readLines().map { it -> it.toDouble() }.toDoubleArray()
+    mergeDoubleSort(input, 0, input.size)
+    val output = File(outputName).bufferedWriter()
+    for (elem in input) {
+        output.write(elem.toString())
+        output.newLine()
+    }
+    output.close()
+}
+
+private fun merge(elements: DoubleArray, begin: Int, middle: Int, end: Int) {
+    val left = Arrays.copyOfRange(elements, begin, middle)
+    val right = Arrays.copyOfRange(elements, middle, end)
+    var li = 0
+    var ri = 0
+    for (i in begin until end) {
+        if (li < left.size && (ri == right.size || left[li] <= right[ri])) {
+            elements[i] = left[li++]
+        } else {
+            elements[i] = right[ri++]
+        }
+    }
+}
+
+private fun mergeDoubleSort(elements: DoubleArray, begin: Int, end: Int) {
+    if (end - begin <= 1) return
+    val middle = (begin + end) / 2
+    mergeDoubleSort(elements, begin, middle)
+    mergeDoubleSort(elements, middle, end)
+    merge(elements, begin, middle, end)
 }
 
 /**
@@ -128,7 +182,37 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  */
 fun sortSequence(inputName: String, outputName: String) {
-    TODO()
+    val input = File(inputName).readLines().map { it -> it.toInt() }.toIntArray()
+    var max = 0
+    for (elem in input) {
+        if (elem > max) max = elem
+    }
+    val count = IntArray(max + 1)
+    for (elem in input) {
+        count[elem]++
+    }
+    var number = 0
+    var counter = count[0]
+    for (i in 1 until count.size) {
+        if (count[i] > counter) {
+            counter = count[i]
+            number = i
+        }
+    }
+    val output = File(outputName).bufferedWriter()
+    for (elem in input) {
+        if (elem != number) {
+            output.write(elem.toString())
+            output.newLine()
+        }
+    }
+    var i = 0
+    while (i != count[number]) {
+        output.write(number.toString())
+        output.newLine()
+        i++
+    }
+    output.close()
 }
 
 /**
@@ -146,6 +230,14 @@ fun sortSequence(inputName: String, outputName: String) {
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
  */
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
-    TODO()
+    var li = 0
+    var ri = first.size
+    for (i in 0 until second.size) {
+        if (li < first.size && (ri == second.size || first[li] <= second[ri]!!)) {
+            second[i] = first[li++]
+        } else {
+            second[i] = second[ri++]
+        }
+    }
 }
 
