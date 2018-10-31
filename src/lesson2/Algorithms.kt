@@ -2,6 +2,9 @@
 
 package lesson2
 
+import java.io.File
+import java.lang.Math.abs
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -106,7 +109,7 @@ fun longestCommonSubstring(first: String, second: String): String {
         }
     }
     var string = ""
-    while (max > 0){
+    while (max > 0) {
         string += first[index - max]
         max--
     }
@@ -154,5 +157,46 @@ fun calcPrimesNumber(limit: Int): Int {
  * Остальные символы ни в файле, ни в словах не допускаются.
  */
 fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
-    TODO()
+    val balda = File(inputName).readLines().map { it -> it.replace(" ", "").toCharArray() }.toTypedArray()
+    val output = mutableSetOf<String>()
+    for (word in words) {
+        if (findWord(balda, word, word.length)) output.add(word)
+    }
+    return output
+}
+
+private fun findWord(balda: Array<CharArray>, word: String, length:Int): Boolean {
+    val n = balda.size
+    val m = balda[0].size
+    val visited = Array(n) { BooleanArray(m) }
+    val subStr = ""
+    for (i in 0 until n) {
+        for (j in 0 until m) {
+            if (findWordUtil(balda, visited, i, j, subStr, word, length)) return true
+        }
+    }
+    return false
+}
+
+private fun findWordUtil(balda: Array<CharArray>, visited: Array<BooleanArray>, i: Int, j: Int, subStr: String, word: String, length: Int): Boolean {
+
+    visited[i][j] = true
+    var str = subStr
+    str += balda[i][j]
+    println(str)
+
+    if (str == word) return true
+    if (str.length == length) {
+        visited[i][j] = false
+        return false
+    }
+
+    for (col in i - 1..i + 1) {
+        for (row in j - 1..j + 1) {
+            if (abs((col + row) - (i + j)) == 1 && col in 0 until balda.size && row in 0 until balda[0].size && !visited[col][row])
+                if (findWordUtil(balda, visited, col, row, str, word, length)) return true
+        }
+    }
+    visited[i][j] = false
+    return false
 }
