@@ -179,18 +179,15 @@ private fun findWord(balda: Array<CharArray>, word: String, length:Int): Boolean
 }
 
 private fun findWordUtil(balda: Array<CharArray>, visited: Array<BooleanArray>, i: Int, j: Int, subStr: String, word: String, length: Int): Boolean {
-
     visited[i][j] = true
     var str = subStr
     str += balda[i][j]
-    println(str)
-
     if (str == word) return true
     if (str.length == length) {
         visited[i][j] = false
         return false
     }
-
+    //search in up/down/left/right directions
     for (col in i - 1..i + 1) {
         for (row in j - 1..j + 1) {
             if (abs((col + row) - (i + j)) == 1 && col in 0 until balda.size && row in 0 until balda[0].size && !visited[col][row])
