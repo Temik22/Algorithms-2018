@@ -160,30 +160,30 @@ fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
     val balda = File(inputName).readLines().map { it -> it.replace(" ", "").toCharArray() }.toTypedArray()
     val output = mutableSetOf<String>()
     for (word in words) {
-        if (findWord(balda, word, word.length)) output.add(word)
+        if (findWord(balda, word)) output.add(word)
     }
     return output
 }
 
-private fun findWord(balda: Array<CharArray>, word: String, length:Int): Boolean {
+private fun findWord(balda: Array<CharArray>, word: String): Boolean {
     val n = balda.size
     val m = balda[0].size
     val visited = Array(n) { BooleanArray(m) }
     val subStr = ""
     for (i in 0 until n) {
         for (j in 0 until m) {
-            if (findWordUtil(balda, visited, i, j, subStr, word, length)) return true
+            if (findWordUtil(balda, visited, i, j, subStr, word)) return true
         }
     }
     return false
 }
 
-private fun findWordUtil(balda: Array<CharArray>, visited: Array<BooleanArray>, i: Int, j: Int, subStr: String, word: String, length: Int): Boolean {
+private fun findWordUtil(balda: Array<CharArray>, visited: Array<BooleanArray>, i: Int, j: Int, subStr: String, word: String): Boolean {
     visited[i][j] = true
     var str = subStr
     str += balda[i][j]
     if (str == word) return true
-    if (str.length == length) {
+    if (str.length == word.length) {
         visited[i][j] = false
         return false
     }
@@ -191,7 +191,7 @@ private fun findWordUtil(balda: Array<CharArray>, visited: Array<BooleanArray>, 
     for (col in i - 1..i + 1) {
         for (row in j - 1..j + 1) {
             if (abs((col + row) - (i + j)) == 1 && col in 0 until balda.size && row in 0 until balda[0].size && !visited[col][row])
-                if (findWordUtil(balda, visited, col, row, str, word, length)) return true
+                if (findWordUtil(balda, visited, col, row, str, word)) return true
         }
     }
     visited[i][j] = false

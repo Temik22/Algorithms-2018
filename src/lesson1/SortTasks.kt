@@ -35,29 +35,25 @@ import java.util.*
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortTimes(inputName: String, outputName: String) {
-    val list = File(inputName).readLines().map { it -> it.split(':') }.map { it ->
-        it.reversed().foldIndexed(0)
-        { index, prev, elem -> Math.pow(60.0, index.toDouble()).toInt() * elem.toInt() + prev }
-    }.toIntArray()
-    insertionSort(list)
-    val outputFile = File(outputName).bufferedWriter()
-    for (i in 0..list.lastIndex) {
-        outputFile.write("${toTwoDigit(list[i] / 3600)}:" + "${toTwoDigit((list[i] / 60) % 60)}:"
-                + toTwoDigit(list[i] % 60))
-        outputFile.newLine()
+    /**
+     * labor intensity:
+     * resource intensity: O(N)
+     */
+    val list = File(inputName).readLines()
+            .asSequence()
+            .map { it -> it.split(":") }
+            .map { it ->
+                val (h, m, s) = it
+                h.toInt() * 3600 + m.toInt() * 60 + s.toInt()
+            }.toList().toIntArray()
+    quickSort(list)
+    File(outputName).writer().run {
+        list.forEach { it ->
+            write("%02d:%02d:%02d\n".format(it / 3600, (it / 60) % 60, it % 60))
+        }
+        close()
     }
-    outputFile.close()
 }
-
-/**
- * Additional function
- */
-
-fun toTwoDigit(x: Int): String {
-    if (x in 0..9) return "0$x"
-    return "$x"
-}
-
 
 /**
  * Сортировка адресов
@@ -120,36 +116,20 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    val input = File(inputName).readLines().map { it -> it.toDouble() }.toDoubleArray()
-    mergeDoubleSort(input, 0, input.size)
+    /**
+     * labor intensity:
+     * resource intensity: O(N)
+     */
+    val input = File(inputName).readLines()
+            .asSequence()
+            .map { it -> it.toDouble() }
+            .toList()
     val output = File(outputName).bufferedWriter()
-    for (elem in input) {
+    for (elem in input.sorted()) {
         output.write(elem.toString())
         output.newLine()
     }
     output.close()
-}
-
-private fun merge(elements: DoubleArray, begin: Int, middle: Int, end: Int) {
-    val left = Arrays.copyOfRange(elements, begin, middle)
-    val right = Arrays.copyOfRange(elements, middle, end)
-    var li = 0
-    var ri = 0
-    for (i in begin until end) {
-        if (li < left.size && (ri == right.size || left[li] <= right[ri])) {
-            elements[i] = left[li++]
-        } else {
-            elements[i] = right[ri++]
-        }
-    }
-}
-
-private fun mergeDoubleSort(elements: DoubleArray, begin: Int, end: Int) {
-    if (end - begin <= 1) return
-    val middle = (begin + end) / 2
-    mergeDoubleSort(elements, begin, middle)
-    mergeDoubleSort(elements, middle, end)
-    merge(elements, begin, middle, end)
 }
 
 /**
@@ -182,7 +162,13 @@ private fun mergeDoubleSort(elements: DoubleArray, begin: Int, end: Int) {
  * 2
  */
 fun sortSequence(inputName: String, outputName: String) {
-    val input = File(inputName).readLines().map { it -> it.toInt() }.toIntArray()
+    /**
+     * labor intensity:
+     * resource intensity: O(N)
+     */
+    val input = File(inputName).readLines()
+            .map { it -> it.toInt() }
+            .toIntArray()
     var max = 0
     for (elem in input) {
         if (elem > max) max = elem
@@ -193,7 +179,7 @@ fun sortSequence(inputName: String, outputName: String) {
     }
     var number = 0
     var counter = count[0]
-    for (i in 1 until count.size) {
+    for (i in 0 until count.size) {
         if (count[i] > counter) {
             counter = count[i]
             number = i
@@ -230,6 +216,10 @@ fun sortSequence(inputName: String, outputName: String) {
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
  */
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
+    /**
+     * labor intensity:
+     * resource intensity: O(N)
+     */
     var li = 0
     var ri = first.size
     for (i in 0 until second.size) {
