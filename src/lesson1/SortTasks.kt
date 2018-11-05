@@ -36,7 +36,7 @@ import java.util.*
  */
 fun sortTimes(inputName: String, outputName: String) {
     /**
-     * labor intensity:
+     * labor intensity: O(N*logN)
      * resource intensity: O(N)
      */
     val list = File(inputName).readLines()
@@ -117,7 +117,7 @@ fun sortAddresses(inputName: String, outputName: String) {
  */
 fun sortTemperatures(inputName: String, outputName: String) {
     /**
-     * labor intensity:
+     * labor intensity: O(N*logN)
      * resource intensity: O(N)
      */
     val input = File(inputName).readLines()
@@ -163,16 +163,16 @@ fun sortTemperatures(inputName: String, outputName: String) {
  */
 fun sortSequence(inputName: String, outputName: String) {
     /**
-     * labor intensity:
-     * resource intensity: O(N)
+     * labor intensity: O(N)
+     * resource intensity: O(N+M) N = input.size; M = count.size
      */
-    val input = File(inputName).readLines()
+    val input = File(inputName).readLines() //o n
             .map { it -> it.toInt() }
             .toIntArray()
     var max = 0
     for (elem in input) {
         if (elem > max) max = elem
-    }
+    }// o n
     val count = IntArray(max + 1)
     for (elem in input) {
         count[elem]++
@@ -217,8 +217,8 @@ fun sortSequence(inputName: String, outputName: String) {
  */
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
     /**
-     * labor intensity:
-     * resource intensity: O(N)
+     * labor intensity: O(N)
+     * resource intensity: O(N): N = second.size
      */
     var li = 0
     var ri = first.size

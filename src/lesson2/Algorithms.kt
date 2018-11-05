@@ -95,6 +95,10 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * вернуть ту из них, которая встречается раньше в строке first.
  */
 fun longestCommonSubstring(first: String, second: String): String {
+    /**
+     * labor intensity: O(N*M)
+     * resource intensity: O(N*M)
+     */
     var max = 0
     var index = 0
     val sub = Array(first.length + 1) { IntArray(second.length + 1) }
@@ -157,11 +161,15 @@ fun calcPrimesNumber(limit: Int): Int {
  * Остальные символы ни в файле, ни в словах не допускаются.
  */
 fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
+    /**
+     * labor intensity: O(N*M)
+     * resource intensity: O(N*M)
+     */
     val balda = File(inputName).readLines().map { it -> it.replace(" ", "").toCharArray() }.toTypedArray()
     val output = mutableSetOf<String>()
     for (word in words) {
         if (findWord(balda, word)) output.add(word)
-    }
+    } //O(N)
     return output
 }
 
@@ -174,7 +182,7 @@ private fun findWord(balda: Array<CharArray>, word: String): Boolean {
         for (j in 0 until m) {
             if (findWordUtil(balda, visited, i, j, subStr, word)) return true
         }
-    }
+    }//O(N*M)
     return false
 }
 

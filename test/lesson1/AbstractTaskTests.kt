@@ -1,7 +1,9 @@
 package lesson1
 
+import org.junit.jupiter.api.assertThrows
 import java.io.BufferedWriter
 import java.io.File
+import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.math.abs
 
@@ -32,6 +34,11 @@ abstract class AbstractTaskTests : AbstractFileTests() {
             )
         } finally {
             File("temp.txt").delete()
+        }
+        try {
+            assertThrows<IllegalArgumentException> { sortTimes("input/time_in_unexp.txt", "anyFile.txt") }
+        } finally {
+            File("anyFile.txt").delete()
         }
         try {
             sortTimes("input/time_in3.txt", "temp.txt")
@@ -177,6 +184,11 @@ abstract class AbstractTaskTests : AbstractFileTests() {
                     """.trimIndent())
         } finally {
             File("temp.txt").delete()
+        }
+        try {
+            assertThrows<IllegalArgumentException> { sortSequence("input/seq_in_unexp.txt", "anyFile.txt") }
+        } finally {
+            File("anyFile.txt").delete()
         }
 
         fun BufferedWriter.writeNumbers(numbers: List<Int>) {
