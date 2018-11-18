@@ -1,5 +1,6 @@
 package lesson3
 
+import java.lang.IllegalArgumentException
 import java.util.SortedSet
 import kotlin.NoSuchElementException
 
@@ -50,12 +51,86 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         return right == null || right.value > node.value && checkInvariant(right)
     }
 
+
+    private fun setNode(right: Boolean, ancestor: Node<T>, current: Node<T>) {
+        if (right) ancestor.right = current
+        else ancestor.left = current
+    }
+
     /**
      * Удаление элемента в дереве
      * Средняя
      */
     override fun remove(element: T): Boolean {
-        TODO()
+        if (!this.contains(element)) return false
+        var current = root ?: return false
+        var ancestor = root ?: return false
+        var inRightDirection = true
+        while (current.value != element) {
+            ancestor = current
+            if (element > current.value) {
+                current = current.right ?: return false
+                inRightDirection = true
+            } else if (element < current.value) {
+                current = current.left ?: return false
+                inRightDirection = false
+            }
+        }
+        when{
+            current.left == null && current.right == null ->{
+                when {
+                    current == root -> root = null
+                    inRightDirection -> ancestor.right = null
+                    else -> ancestor.left = null
+                }
+            }
+            current.left == null -> {
+                if (current == root) root = current.right
+                else {
+                    val right = current.right ?: return false
+                    setNode(inRightDirection, ancestor, right)
+                }
+            }
+            current.right == null -> {
+                if (current == root) root = current.left
+                else {
+                    val left = current.left ?: return false
+                    setNode(inRightDirection, ancestor, left)
+                }
+            }
+            else -> {
+                var minimum = current.right ?: return false
+                var ancestorMin = current.right ?: return false
+                while (minimum.left != null) {
+                    ancestorMin = minimum
+                    val left = minimum.left ?: return false
+                    minimum = left
+                }
+                when {
+                    current == root && ancestorMin == minimum -> {
+                        val rootLeft = root!!.left
+                        root = minimum
+                        minimum.left = rootLeft
+                    }
+                    current == root && ancestorMin != minimum -> {
+                        ancestorMin.left = minimum.right
+                        root = minimum
+                        minimum.left = current.left
+                        minimum.right = current.right
+                    }
+                    ancestorMin == minimum -> setNode(inRightDirection, ancestor, minimum)
+                    else -> {
+                        ancestorMin.left = minimum.right
+                        minimum.right = current.right
+                        minimum.left = current.left
+                        setNode(inRightDirection, ancestor, minimum)
+                    }
+                }
+                minimum.left = current.left
+            }
+        }
+        size--
+        return true
     }
 
     override operator fun contains(element: T): Boolean {
@@ -84,7 +159,25 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Средняя
          */
         private fun findNext(): Node<T>? {
-            TODO()
+            if (size == 0) return null
+            val currentNode = current ?: return find(first())
+            if (currentNode.value == last()) return null
+            if (currentNode.right != null) {
+                var successor = currentNode.right ?: throw IllegalArgumentException()
+                while (successor.left != null)
+                    successor = successor.left ?: throw IllegalArgumentException()
+                return successor
+            } else {
+                var successor = root ?: throw IllegalArgumentException()
+                var ancestor = root ?: throw IllegalArgumentException()
+                while (ancestor != currentNode) {
+                    if (currentNode.value < ancestor.value) {
+                        successor = ancestor
+                        ancestor = ancestor.left ?: return null
+                    } else ancestor = ancestor.right ?: return null
+                }
+                return successor
+            }
         }
 
         override fun hasNext(): Boolean = findNext() != null
@@ -99,6 +192,30 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Сложная
          */
         override fun remove() {
+            val current = current ?: throw IllegalArgumentException()
+            var ancestor = root ?: throw IllegalArgumentException()
+            var successor = root ?: throw IllegalArgumentException()
+            var inRightDirection = false
+            while (successor != current){
+                ancestor = successor
+                if (successor.value < current.value) {
+                    successor = successor.right ?: throw IllegalArgumentException()
+                    inRightDirection = true
+                } else {
+                    successor = successor.left ?: throw IllegalArgumentException()
+                    inRightDirection = false
+                }
+            }
+            when{
+                current.right == null && current.left == null -> when {
+                    current == root -> root = null
+                    inRightDirection -> ancestor.right == null
+                    else -> ancestor.left = null
+                }
+                current.right == null -> {
+
+                }
+            }
             TODO()
         }
     }
