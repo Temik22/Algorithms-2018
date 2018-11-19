@@ -62,6 +62,10 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
      * Средняя
      */
     override fun remove(element: T): Boolean {
+        /**
+         * labor intensity: O(logN)
+         * resource intensity: O(logN)
+         */
         if (!this.contains(element)) return false
         var current = root ?: return false
         var ancestor = root ?: return false
@@ -76,8 +80,8 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
                 inRightDirection = false
             }
         }
-        when{
-            current.left == null && current.right == null ->{
+        when {
+            current.left == null && current.right == null -> {
                 when {
                     current == root -> root = null
                     inRightDirection -> ancestor.right = null
@@ -103,8 +107,7 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
                 var ancestorMin = current.right ?: return false
                 while (minimum.left != null) {
                     ancestorMin = minimum
-                    val left = minimum.left ?: return false
-                    minimum = left
+                    minimum = minimum.left ?: return false
                 }
                 when {
                     current == root && ancestorMin == minimum -> {
@@ -159,6 +162,10 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Средняя
          */
         private fun findNext(): Node<T>? {
+            /**
+             * labor intensity: O(logN)
+             * resource intensity: O(logN)
+             */
             if (size == 0) return null
             val currentNode = current ?: return find(first())
             if (currentNode.value == last()) return null
@@ -192,13 +199,17 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Сложная
          */
         override fun remove() {
-            val current = current ?: throw IllegalArgumentException()
+            /**
+             * labor intensity: O(logN)
+             * resource intensity: O(logN)
+             */
+            val it = current ?: throw IllegalArgumentException()
             var ancestor = root ?: throw IllegalArgumentException()
             var successor = root ?: throw IllegalArgumentException()
             var inRightDirection = false
-            while (successor != current){
+            while (successor != current) {
                 ancestor = successor
-                if (successor.value < current.value) {
+                if (successor.value < it.value) {
                     successor = successor.right ?: throw IllegalArgumentException()
                     inRightDirection = true
                 } else {
@@ -206,17 +217,60 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
                     inRightDirection = false
                 }
             }
-            when{
-                current.right == null && current.left == null -> when {
-                    current == root -> root = null
-                    inRightDirection -> ancestor.right == null
-                    else -> ancestor.left = null
+            when {
+                it.left == null && it.right == null -> {
+                    when {
+                        current == root -> root = null
+                        inRightDirection -> ancestor.right = null
+                        else -> ancestor.left = null
+                    }
                 }
-                current.right == null -> {
-
+                it.left == null -> {
+                    when {
+                        current == root -> root = it.right
+                        inRightDirection -> ancestor.right = it.right
+                        else -> ancestor.left = it.right
+                    }
+                }
+                it.right == null -> {
+                    when {
+                        current == root -> root = it.left
+                        inRightDirection -> ancestor.right = it.left
+                        else -> ancestor.left = it.left
+                    }
+                }
+                else -> {
+                    var min = it.right ?: return
+                    var ancestorMin = min
+                    while (min.left != null) {
+                        ancestorMin = min
+                        min = min.left ?: return
+                    }
+                    when {
+                        it == root && ancestorMin == min -> {
+                            val rootLeft = root!!.left
+                            root = min
+                            min.left = rootLeft
+                        }
+                        it == root && ancestorMin != min -> {
+                            ancestorMin.left = min.right
+                            root = min
+                            min.left = it.left
+                            min.right = it.right
+                        }
+                        ancestorMin == min -> setNode(inRightDirection, ancestor, min)
+                        else -> {
+                            ancestorMin.left = min.right
+                            min.right = it.right
+                            min.left = it.left
+                            setNode(inRightDirection, ancestor, min)
+                        }
+                    }
+                    min.left = it.left
                 }
             }
-            TODO()
+            size--
+            current = findNext()
         }
     }
 
