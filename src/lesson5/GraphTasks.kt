@@ -2,6 +2,9 @@
 
 package lesson5
 
+import java.lang.IllegalArgumentException
+import java.util.*
+
 /**
  * Эйлеров цикл.
  * Средняя
@@ -28,8 +31,52 @@ package lesson5
  * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
  * связного графа ровно по одному разу
  */
+
+fun Graph.haveEulerLoop():Boolean {
+    /**
+     * n = vertices
+     * m = edges
+     * labor intensity: O(n + m)
+     * resource intensity: O(n + m)
+     */
+    for (it in vertices)
+        if (getNeighbors(it).size % 2 == 0) return true
+    return false
+}
+
+
 fun Graph.findEulerLoop(): List<Graph.Edge> {
-    TODO()
+    if (!this.haveEulerLoop()) return emptyList()
+
+    val stack = Stack<Graph.Vertex>()
+
+    val answer = ArrayDeque<Graph.Vertex>()
+    stack.push(vertices.first())
+
+    val edgesSet = mutableSetOf<Graph.Edge>()
+    edgesSet.addAll(edges)
+
+    while (!stack.isEmpty()) {
+        val last = stack.last()
+        for (it in vertices) {
+            val newEdge = getConnection(last, it)
+            if (edgesSet.contains(newEdge) && newEdge != null) {
+                stack.push(it)
+                edgesSet.remove(newEdge)
+                break
+            }
+        }
+        if (last == stack.last()) {
+            stack.pop()
+            answer.add(last)
+        }
+    }
+
+    val listOfAnswer = mutableListOf<Graph.Edge>()
+    (0..answer.size - 2).forEach {
+        getConnection(answer.poll(), answer.first)?.let { i -> listOfAnswer.add(i) }
+    }
+    return listOfAnswer
 }
 
 /**
@@ -61,7 +108,7 @@ fun Graph.findEulerLoop(): List<Graph.Edge> {
  * J ------------ K
  */
 fun Graph.minimumSpanningTree(): Graph {
-    TODO()
+   TODO()
 }
 
 /**
@@ -88,7 +135,27 @@ fun Graph.minimumSpanningTree(): Graph {
  * Эта задача может быть зачтена за пятый и шестой урок одновременно
  */
 fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
-    TODO()
+    /**
+     * n = vertices
+     * m = edges
+     * labor intensity: O(n + m)
+     * resource intensity: O(n)
+     */
+    val first = this.vertices.first() ?: return emptySet()
+    val childSet = mutableSetOf<Graph.Vertex>()
+    val childOfChildSet = mutableSetOf<Graph.Vertex>(first)
+
+    findChildren(first, childSet, childOfChildSet)
+    return if (childOfChildSet.size >= childSet.size) childOfChildSet else childSet
+}
+
+fun Graph.findChildren(first: Graph.Vertex, children: MutableSet<Graph.Vertex>, childOfChildren: MutableSet<Graph.Vertex>) {
+    for (it in getNeighbors(first)){
+        if (!children.contains(it) && !childOfChildren.contains(it)){
+            if (childOfChildren.contains(first)) children.add(it) else childOfChildren.add(it)
+            findChildren(it, children, childOfChildren)
+        }
+    }
 }
 
 /**
